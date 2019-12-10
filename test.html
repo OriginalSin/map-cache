@@ -1,0 +1,51 @@
+<!DOCTYPE >
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Leaflet Geometry Management</title>
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@latest/dist/leaflet.css"
+        />
+        <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
+            <script src="./test_geo.geojson"></script>
+
+        <style>
+            html,
+            body {
+                font-family: Arial, Verdana;
+                background-color: #eef1ef;
+                font-size: 16px;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+
+            .wrapper {
+                width: 100%;
+                height: 100%;
+            }
+
+            #map {
+                height: 500px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="wrapper"><div id="map"></div></div>
+		<script>
+var map = L.map('map').setView([55, 36], 6);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+L.geoJSON(json).addTo(map);
+
+var op = L.latLng([53.903529, 34.963989]);
+L.marker(op).addTo(map);
+
+		</script>
+    </body>
+</html>
