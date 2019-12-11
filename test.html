@@ -38,8 +38,58 @@
 <script>
 var map = L.map('map').setView([55, 36], 6);
 
+var Mercator = L.TileLayer.extend({
+	options: {
+		tilesCRS: L.CRS.EPSG3395
+	},
+	_getTiledPixelBounds: function (center) {
+		var pixelBounds = L.TileLayer.prototype._getTiledPixelBounds.call(this, center);
+		this._shiftY = this._getShiftY(this._tileZoom);
+		pixelBounds.min.y += this._shiftY;
+		pixelBounds.max.y += this._shiftY;
+		return pixelBounds;
+	},
+	_tileOnError: function (done, tile, e) {
+		var file = tile.getAttribute('src'),
+			pos = file.indexOf('/mapcache/');
+
+		if (pos > -1) {
+			var searchParams = new URL('http:' + file).searchParams,
+				arr = file.substr(pos + 1).split('/'),
+				pItem  = proxy[arr[1]];
+
+			tile.src = L.Util.template(pItem.errorTileUrlPrefix + pItem.postfix, {
+				z: searchParams.get('z'),
+				x: searchParams.get('x'),
+				y: searchParams.get('y')
+			});
+		}
+		done(e, tile);
+	},
+	_getTilePos: function (coords) {
+		var tilePos = L.TileLayer.prototype._getTilePos.call(this, coords);
+		return tilePos.subtract([0, this._shiftY]);
+	},
+
+	_getShiftY: function(zoom) {
+		var map = this._map,
+			pos = map.getCenter(),
+			shift = (map.options.crs.project(pos).y - this.options.tilesCRS.project(pos).y);
+
+		return Math.floor(L.CRS.scale(zoom) * shift / 40075016.685578496);
+	}
+});
+L.TileLayer.Mercator = Mercator;
+L.tileLayer.Mercator = function (url, options) {
+	return new Mercator(url, options);
+};
+
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+L.tileLayer.Mercator('https://01.core-nmaps-renderer-nmaps.maps.yandex.net/?x={x}&y={y}&z={z}&l=mpskl&sl=302827', {
 }).addTo(map);
 
 
