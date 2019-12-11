@@ -8,7 +8,8 @@
             href="https://unpkg.com/leaflet@latest/dist/leaflet.css"
         />
         <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
-            <script src="./test_geo.geojson"></script>
+            <!-- <script src="./test_geo.geojson"></script> -->
+            <script src="./points.json"></script>
 
         <style>
             html,
@@ -27,25 +28,49 @@
             }
 
             #map {
-                height: 500px;
+                height: 100%;
             }
         </style>
     </head>
 
     <body>
         <div class="wrapper"><div id="map"></div></div>
-		<script>
+<script>
 var map = L.map('map').setView([55, 36], 6);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-L.geoJSON(json).addTo(map);
 
-var op = L.latLng([53.903529, 34.963989]);
-L.marker(op).addTo(map);
+let op = L.latLng([54.784907, 36.240289]),
+	fg = L.featureGroup().addTo(map),
+	reCalc = (optm) => {
+		points.forEach((it) => {
+			let sp = L.point(it.start_x, it.start_y)._multiplyBy(1000)._add(optm),
+				ep = L.point(it.end_x, it.end_y)._multiplyBy(1000)._add(optm),
+				sl = L.Projection.SphericalMercator.unproject(sp),
+				el = L.Projection.SphericalMercator.unproject(ep),
+				latlngs = [sl, el],
+				pt = it._line;
+			if (!pt) {
+				pt = L.polyline(latlngs);
+				fg.addLayer(pt);
+			} else {
+				pt.setLatLngs(latlngs);
+			}
+			it._line = pt;
+		});
+	};
 
-		</script>
+reCalc(L.Projection.SphericalMercator.project(op));
+L.marker(op, {draggable: true})
+	.on('drag', (ev) => {
+		console.log('Опорная точка:', ev.latlng)
+		reCalc(L.Projection.SphericalMercator.project(ev.latlng));
+	})
+	.addTo(map);
+
+</script>
     </body>
 </html>
