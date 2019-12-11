@@ -36,7 +36,7 @@
     <body>
         <div class="wrapper"><div id="map"></div></div>
 <script>
-var map = L.map('map').setView([55, 36], 6);
+var map = L.map('map').setView([55, 36], 8);
 
 var Mercator = L.TileLayer.extend({
 	options: {
@@ -84,15 +84,6 @@ L.tileLayer.Mercator = function (url, options) {
 	return new Mercator(url, options);
 };
 
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-
-L.tileLayer.Mercator('https://01.core-nmaps-renderer-nmaps.maps.yandex.net/?x={x}&y={y}&z={z}&l=mpskl&sl=302827', {
-}).addTo(map);
-
-
 let op = L.latLng([54.784907, 36.240289]),
 	fg = L.featureGroup().addTo(map),
 	reCalc = (optm) => {
@@ -120,6 +111,16 @@ L.marker(op, {draggable: true})
 		reCalc(L.Projection.SphericalMercator.project(ev.latlng));
 	})
 	.addTo(map);
+
+
+L.control.layers({
+    "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		}).addTo(map)
+}, {
+    "Скорости": L.tileLayer.Mercator('https://01.core-nmaps-renderer-nmaps.maps.yandex.net/?x={x}&y={y}&z={z}&l=mpskl&sl=302827', {}).addTo(map),
+    "Странные Участки": fg
+}).addTo(map);
 
 </script>
     </body>
