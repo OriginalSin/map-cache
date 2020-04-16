@@ -52,6 +52,19 @@ const conf = {
 			},
 			prefix: 'https://sat04.maps.yandex.net/tiles',
 		},
+		v1: {
+			title: 'Водоохранные зоны',
+			urlTemplate: '../tiles/v1/{z}/{x}/{y}.png',
+			errorTileUrl:
+				'https://pkk.rosreestr.ru/arcgis/rest/services/PKK6/ZONES/MapServer/export?layers=show%3A1&dpi=96&format=PNG32&bbox={bbox}&bboxSR=102100&imageSR=102100&size=1024%2C1024&transparent=true&f=image',
+			type: 'Leaflet.tileLayer.Mercator',
+			options: {
+				minZoom: 8,
+				maxZoom: 19,
+				attribution: yandex,
+			},
+			prefix: 'https://sat04.maps.yandex.net/tiles',
+		},
 	},
 }
 
